@@ -115,7 +115,7 @@ train_batches = train_gen.flow_from_directory(
                                 batch_size=train_batch_size
 )
 
-validate_batches = train_gen.flow_from_directory(
+validate_batches = validate_gen.flow_from_directory(
                                 directory= val_dir,
                                 classes = None, # means automatically infer the label from subdir
                                 class_mode = 'categorical', # white, black, asian
