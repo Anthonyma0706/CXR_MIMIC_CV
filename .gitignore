@@ -1,0 +1,7 @@
+data/tf_records
+data/Edema
+data/Pneumonia_Consolidation
+data/No_finding
+MIMIC_resnet34_race_detection_2021_09_21_custom_splits.ipynb
+ResNet50_60-20-20-split_3-race_detection_LR-0.001_20221117-181956_epoch_012_val_loss_0.48259.h5
+MIMIC_resnet34_race_detection_2021_09_21_custom_splits.ipynb

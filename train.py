@@ -1,4 +1,3 @@
-import tensorflow as tf
 import numpy as np
 import cv2 as cv
 import pandas as pd
@@ -26,24 +25,42 @@ from tensorflow.keras.models import Model
 from tensorflow.keras import initializers
 from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler, ReduceLROnPlateau, ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-#from tensorflow.keras.mixed_precision import experimental as mixed_precision
-# pip install image-classifiers==1.0.0b1
-#from classification_models.tfkeras import Classifiers
-# More information about this package can be found at https://github.com/qubvel/classification_models
 
 #from keras.applications.resnet import ResNet50
 #from keras.applications.vgg16 import VGG16, preprocess_input
-
 seed = 2022
 np.random.seed(seed)
 python_random.seed(seed)
 tf.random.set_seed(seed)
 
-df_meta = pd.read_csv('data\mimic_iv_csv\df_race_3class_1117.csv')
-train_size, test_size, val_size = df_meta['dataset'].value_counts()
-print(df_meta['dataset'].value_counts())
+# df_meta = pd.read_csv('data\mimic_iv_csv\df_race_3class_1117.csv')
+# train_size, test_size, val_size = df_meta['dataset'].value_counts()
+# print(df_meta['dataset'].value_counts())
+###################### Image directory ###########################
+# lst = os.listdir(directory) # your directory path
+# number_files = len(lst)
 
+data_dir = 'data/No_finding/images/race' # data/No_finding/images/survive
+train_dir = f'{data_dir}/train'
+test_dir = f'{data_dir}/test'
+val_dir = f'{data_dir}/val'
 
+# count training images only
+f = []
+for (dirpath, dirnames, filenames) in os.walk(train_dir):
+    f.extend(filenames)
+train_size = len(f)
+print('Predicting folder:', data_dir)
+print('Number of training images:', train_size)
+###################### Hyperparameters ###########################
+epochs = 20
+learning_rate = 1e-3
+momentum_val=0.9
+decay_val= 0.0
+
+train_batch_size = 64 # may need to reduce batch size if OOM error occurs
+test_batch_size = 64
+##################################################################
 from keras.applications.resnet import ResNet50, preprocess_input
 HEIGHT = 256
 WIDTH = 256
@@ -62,16 +79,6 @@ model = Model(inputs=[input_a], outputs=[output])
 for layer in base_model.layers: # keep base_model aside from training
     layer.trainable = False
 
-###################### Hyperparameters ###########################
-epochs = 20
-learning_rate = 1e-3
-momentum_val=0.9
-decay_val= 0.0
-
-train_batch_size = 64 # may need to reduce batch size if OOM error occurs
-test_batch_size = 64
-##################################################################
-
 
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', mode='min', factor=0.1, patience=2, min_lr=1e-5, verbose=1)
 
@@ -89,11 +96,6 @@ model.compile(optimizer=adam_opt,
 print('============= Model loading finished =============')
 
 
-data_dir = 'data/imgs_race'
-
-train_dir = f'{data_dir}/train'
-test_dir = f'{data_dir}/test'
-val_dir = f'{data_dir}/val'
 
 train_gen = ImageDataGenerator(
             rotation_range=15,
@@ -115,7 +117,7 @@ train_batches = train_gen.flow_from_directory(
                                 batch_size=train_batch_size
 )
 
-validate_batches = train_gen.flow_from_directory(
+validate_batches = validate_gen.flow_from_directory(
                                 directory= val_dir,
                                 classes = None, # means automatically infer the label from subdir
                                 class_mode = 'categorical', # white, black, asian
