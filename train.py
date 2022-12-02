@@ -1,4 +1,3 @@
-import tensorflow as tf
 import numpy as np
 import cv2 as cv
 import pandas as pd
@@ -38,15 +37,21 @@ tf.random.set_seed(seed)
 # train_size, test_size, val_size = df_meta['dataset'].value_counts()
 # print(df_meta['dataset'].value_counts())
 ###################### Image directory ###########################
-lst = os.listdir(directory) # your directory path
-number_files = len(lst)
+# lst = os.listdir(directory) # your directory path
+# number_files = len(lst)
 
-data_dir = 'data/imgs_race'
+data_dir = 'data/No_finding/images/race' # data/No_finding/images/survive
 train_dir = f'{data_dir}/train'
 test_dir = f'{data_dir}/test'
 val_dir = f'{data_dir}/val'
 
-train_size = len(os.listdir(train_dir))
+# count training images only
+f = []
+for (dirpath, dirnames, filenames) in os.walk(train_dir):
+    f.extend(filenames)
+train_size = len(f)
+print('Predicting folder:', data_dir)
+print('Number of training images:', train_size)
 ###################### Hyperparameters ###########################
 epochs = 20
 learning_rate = 1e-3
