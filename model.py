@@ -115,7 +115,7 @@ def model_training(disease, task, model_name, learning_rate = 1e-3, train_batch_
     #     return model
 
     def define_densenet_model(n_classes=1, input_shape=(224,224,3)):
-        base_model = tf.keras.applications.densenet.DenseNet121(weights=None, include_top=False, input_shape=input_shape)
+        base_model = tf.keras.applications.densenet.DenseNet121(weights='imagenet', include_top=False, input_shape=input_shape)
         x = AveragePooling2D(pool_size=(3,3), name='avg_pool')(base_model.output)
         x = Flatten()(x)
         x = Dense(1024, activation='relu', name='dense_post_pool')(x)
@@ -127,7 +127,7 @@ def model_training(disease, task, model_name, learning_rate = 1e-3, train_batch_
     if model_name == 'densenet':
         HEIGHT = 224
         WIDTH = 224
-        model = define_densenet_model(num_class) #define_densenet_model()
+        model = define_densenet_model(num_class, input_shape=(HEIGHT,WIDTH,3))
         preprocess_input = tf.keras.applications.densenet.preprocess_input
     elif model_name == 'resnet50':
         input_a = Input(shape=(HEIGHT, WIDTH, 3))
@@ -220,8 +220,8 @@ def model_training(disease, task, model_name, learning_rate = 1e-3, train_batch_
     
     arc_name = f'{model_name}_{disease}_{task}_detection'
 
-    csv_logger = CSVLogger(f'saved_models/{model_name}_{disease}_{task}_detection_{var_date}.log')
-    ES = EarlyStopping(monitor='val_loss', mode='min', patience=3, restore_best_weights=True)
+    csv_logger = CSVLogger(f'saved_models/cxr_{arc_name}_{var_date}.log')
+    ES = EarlyStopping(monitor='val_loss', mode='min', patience=4, restore_best_weights=True)
     checkloss = ModelCheckpoint("saved_models/" + str(arc_name) + "_LR-" + str(learning_rate) + "_" + var_date+ "_epoch_{epoch:03d}_val_loss_{val_loss:.5f}.h5", 
                             monitor='val_loss', mode='min', verbose=1, 
                             save_best_only=True, 
