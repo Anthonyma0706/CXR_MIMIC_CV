@@ -1,23 +1,12 @@
 import numpy as np
-import cv2 as cv
 import pandas as pd
 from tqdm import tqdm
-
 from datetime import datetime
-import glob
 import math
 import matplotlib.pyplot as plt
-import matplotlib
-import numpy as np
 import os
 import pandas as pd
-from PIL import Image
-import random as python_random
-#import seaborn as sns
-from sklearn.metrics import classification_report, roc_auc_score, roc_curve, precision_recall_curve
-from sklearn.metrics import auc, accuracy_score, recall_score, precision_score, f1_score, confusion_matrix
-from sklearn.utils import shuffle
-import sys
+
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import AveragePooling2D, Dropout, Flatten, GlobalAveragePooling2D, Input, Dense, Activation
@@ -35,23 +24,31 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 def model_training(disease, task, model_name, learning_rate = 1e-3, train_batch_size = 64, epochs = 20, model_weight_pth = '', class_weight = None):
 
-    ##################################
-    ########## Needs to change together ##############
-    ##################################
-    # from keras.applications.resnet import ResNet50, preprocess_input
-    # model_name = 'ResNet50' 
-    ##################################
-    ##################################
-
     seed = 2022
     np.random.seed(seed)
-    python_random.seed(seed)
+    #python_random.seed(seed)
     tf.random.set_seed(seed)
 
     
     ###################### Image directory ###########################
-    num_class = 2 if task == 'survive' else 3
-    classes = ['ASIAN','BLACK','WHITE'] if task == 'race' else ['DIE','SURVIVE']
+    if task == 'survive' :
+        num_class = 2
+        classes = ['DIE','SURVIVE']
+    elif task == 'white':
+        num_class = 2
+        classes = ['NON_WHITE','WHITE']
+    elif task == 'insurance':
+        num_class = 3
+        #classes = ['NON_WHITE','WHITE']
+    elif task == 'gender':
+        num_class = 2
+    elif task == 'race':
+        num_class = 3
+        classes = ['ASIAN','BLACK','WHITE']
+    else:
+        print('ERROR IN TASK')
+        return -1
+    
     data_dir = f'data/{disease}/images/{task}'
     train_dir = f'{data_dir}/train'
     test_dir = f'{data_dir}/test'
@@ -187,8 +184,8 @@ def model_training(disease, task, model_name, learning_rate = 1e-3, train_batch_
 
     train_batches = train_gen.flow_from_directory(
                                     directory= train_dir,
-                                    #classes = None, # means automatically infer the label from subdir
-                                    classes = classes,
+                                    classes = None, # means automatically infer the label from subdir
+                                    #classes = classes,
                                     class_mode = 'categorical', # white, black, asian
                                     target_size=(HEIGHT, WIDTH),
                                     shuffle=True,
@@ -198,8 +195,8 @@ def model_training(disease, task, model_name, learning_rate = 1e-3, train_batch_
 
     validate_batches = validate_gen.flow_from_directory(
                                     directory= val_dir,
-                                    # classes = None, # means automatically infer the label from subdir
-                                    classes = classes,
+                                    classes = None, # means automatically infer the label from subdir
+                                    #classes = classes,
                                     class_mode = 'categorical', # white, black, asian
                                     target_size=(HEIGHT, WIDTH),
                                     shuffle=False,
