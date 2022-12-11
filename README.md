@@ -1,4 +1,4 @@
-# CXR_MIMIC_CV
+# Transfer Learning on MIMIC Chest X-Rays to Uncover Associations between Patient Health and Demographics
 
 ###
 As advances in Artificial Intelligence (AI) become increasingly applied in healthcare settings,
